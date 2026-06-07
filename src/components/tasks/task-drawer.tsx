@@ -13,6 +13,8 @@ import { useState } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/cn";
 import type { Profile, Task, TaskComment } from "@/types";
+import { useI18n } from "@/lib/i18n";
+import { enUS, ru } from "date-fns/locale";
 
 export function TaskDrawer({
   task,
@@ -38,6 +40,7 @@ export function TaskDrawer({
   onComment: (body: string) => void;
 }) {
   const [comment, setComment] = useState("");
+  const { locale, t, status, priority, content } = useI18n();
   if (!task) return null;
   const assignee = profiles.find((profile) => profile.id === task.assigneeId)!;
 
@@ -46,21 +49,21 @@ export function TaskDrawer({
       <button
         className="fixed inset-0 z-30 bg-slate-950/20"
         onClick={onClose}
-        aria-label="Close task details"
+        aria-label={t("closeTaskDetails")}
       />
       <aside
         className="fixed inset-y-0 right-0 z-40 w-full max-w-xl overflow-y-auto border-l border-slate-200 bg-white shadow-2xl"
         role="dialog"
         aria-modal="true"
-        aria-label="Task details"
+        aria-label={t("taskDetails")}
       >
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/95 px-6 py-4 backdrop-blur">
           <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">
-            Task details
+            {t("taskDetails")}
           </span>
           <div className="flex items-center gap-1">
             {canEdit && (
-              <button className="icon-button" onClick={onEdit} aria-label="Edit task">
+              <button className="icon-button" onClick={onEdit} aria-label={t("editTask")}>
                 <Pencil className="size-4" />
               </button>
             )}
@@ -68,12 +71,12 @@ export function TaskDrawer({
               <button
                 className="icon-button hover:text-rose-600"
                 onClick={onDelete}
-                aria-label="Delete task"
+                aria-label={t("delete")}
               >
                 <Trash2 className="size-4" />
               </button>
             )}
-            <button className="icon-button" onClick={onClose} aria-label="Close">
+            <button className="icon-button" onClick={onClose} aria-label={t("close")}>
               <X className="size-4" />
             </button>
           </div>
@@ -88,25 +91,25 @@ export function TaskDrawer({
                   : "bg-slate-100 text-slate-600",
               )}
             >
-              {task.priority}
+              {priority(task.priority)}
             </span>
             <span className="rounded-md bg-indigo-50 px-2.5 py-1 text-[11px] font-medium capitalize text-indigo-700">
-              {task.status.replace("_", " ")}
+              {status(task.status)}
             </span>
           </div>
           <h2 className="mt-5 text-2xl font-semibold leading-tight tracking-tight text-slate-950">
-            {task.title}
+            {content(task.title)}
           </h2>
-          <p className="mt-4 text-sm leading-7 text-slate-600">{task.description}</p>
+          <p className="mt-4 text-sm leading-7 text-slate-600">{content(task.description)}</p>
           <dl className="mt-8 grid gap-5 rounded-xl border border-slate-200 bg-slate-50 p-5 sm:grid-cols-2">
-            <Meta icon={UserRound} label="Assignee">
+            <Meta icon={UserRound} label={t("assignee")}>
               <span className="flex items-center gap-2">
                 <Avatar initials={assignee.initials} color={assignee.color} />
                 {assignee.name}
               </span>
             </Meta>
-            <Meta icon={CalendarDays} label="Deadline">
-              {format(parseISO(task.dueDate), "MMMM d, yyyy")}
+            <Meta icon={CalendarDays} label={t("deadline")}>
+              {format(parseISO(task.dueDate), "MMMM d, yyyy", { locale: locale === "ru" ? ru : enUS })}
             </Meta>
           </dl>
           <div className="mt-6 flex flex-wrap gap-2">
@@ -115,7 +118,7 @@ export function TaskDrawer({
                 key={tag}
                 className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs text-slate-500"
               >
-                {tag}
+                {content(tag)}
               </span>
             ))}
           </div>
@@ -123,7 +126,7 @@ export function TaskDrawer({
             <div className="flex items-center gap-2">
               <MessageSquare className="size-4 text-slate-400" />
               <h3 className="font-semibold text-slate-900">
-                Comments <span className="text-slate-400">{comments.length}</span>
+                {t("comments")} <span className="text-slate-400">{comments.length}</span>
               </h3>
             </div>
             <div className="mt-5 space-y-5">
@@ -138,17 +141,17 @@ export function TaskDrawer({
                           {author.name}
                         </span>
                         <span className="text-[11px] text-slate-400">
-                          {format(parseISO(item.createdAt), "MMM d, h:mm a")}
+                          {format(parseISO(item.createdAt), "MMM d, HH:mm", { locale: locale === "ru" ? ru : enUS })}
                         </span>
                       </div>
-                      <p className="mt-2 text-sm leading-6 text-slate-600">{item.body}</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">{content(item.body)}</p>
                     </div>
                   </div>
                 );
               })}
               {!comments.length && (
                 <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
-                  No comments yet. Add the first project update.
+                  {t("noComments")}
                 </p>
               )}
             </div>
@@ -166,11 +169,11 @@ export function TaskDrawer({
                   value={comment}
                   onChange={(event) => setComment(event.target.value)}
                   className="input min-h-24 resize-none"
-                  placeholder="Add a clear update or question..."
+                  placeholder={t("commentPlaceholder")}
                 />
                 <div className="mt-3 flex justify-end">
                   <button className="button-primary" disabled={!comment.trim()}>
-                    Add comment
+                    {t("addComment")}
                   </button>
                 </div>
               </form>

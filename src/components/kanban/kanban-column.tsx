@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 import { TaskCard } from "@/components/tasks/task-card";
 import { cn } from "@/lib/cn";
 import type { Profile, Task, TaskStatus } from "@/types";
+import { useI18n } from "@/lib/i18n";
 
 const columnStyles: Record<TaskStatus, { dot: string; soft: string }> = {
   todo: { dot: "bg-slate-400", soft: "bg-slate-100" },
@@ -35,6 +36,7 @@ export function KanbanColumn({
   onCreate: () => void;
   onTaskClick: (task: Task) => void;
 }) {
+  const { t } = useI18n();
   const droppable = useDroppable({ id: status, data: { type: "column", status } });
   const style = columnStyles[status];
 
@@ -63,7 +65,7 @@ export function KanbanColumn({
           <button
             className="rounded-lg p-1.5 text-slate-400 hover:bg-white hover:text-indigo-600"
             onClick={onCreate}
-            aria-label={`Add task to ${title}`}
+            aria-label={`${t("addTaskTo")} ${title}`}
           >
             <Plus className="size-4" />
           </button>
@@ -85,7 +87,7 @@ export function KanbanColumn({
           ))}
           {!tasks.length && (
             <div className="grid min-h-28 place-items-center rounded-xl border border-dashed border-slate-300 bg-white/60 p-4 text-center text-xs text-slate-400">
-              Drop a task here
+              {t("dropTask")}
             </div>
           )}
         </div>

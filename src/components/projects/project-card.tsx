@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import type { Profile, Project, Task } from "@/types";
+import { useI18n } from "@/lib/i18n";
 
 export function ProjectCard({
   project,
@@ -22,6 +23,7 @@ export function ProjectCard({
   onDelete: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t, content } = useI18n();
   const completed = tasks.filter((task) => task.status === "done").length;
   const progress = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
 
@@ -39,7 +41,7 @@ export function ProjectCard({
             <button
               className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
               onClick={() => setMenuOpen((value) => !value)}
-              aria-label="Project actions"
+              aria-label={t("projectActions")}
             >
               <MoreHorizontal className="size-4" />
             </button>
@@ -52,13 +54,13 @@ export function ProjectCard({
                   }}
                   className="w-full rounded-md px-3 py-2 text-left hover:bg-slate-50"
                 >
-                  Edit
+                  {t("edit")}
                 </button>
                 <button
                   onClick={onDelete}
                   className="w-full rounded-md px-3 py-2 text-left text-rose-600 hover:bg-rose-50"
                 >
-                  Delete
+                  {t("delete")}
                 </button>
               </div>
             )}
@@ -67,16 +69,16 @@ export function ProjectCard({
       </div>
       <Link href={`/projects/${project.id}`} className="mt-5 block">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="font-semibold text-slate-950">{project.name}</h3>
+          <h3 className="font-semibold text-slate-950">{content(project.name)}</h3>
           <ArrowUpRight className="size-4 text-slate-300 transition group-hover:text-indigo-600" />
         </div>
         <p className="mt-2 min-h-10 text-sm leading-5 text-slate-500">
-          {project.description}
+          {content(project.description)}
         </p>
       </Link>
       <div className="mt-6">
         <div className="flex items-center justify-between text-xs text-slate-500">
-          <span>{completed} of {tasks.length} complete</span>
+          <span>{completed} {t("of")} {tasks.length} {t("complete")}</span>
           <span className="font-medium text-slate-700">{progress}%</span>
         </div>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">

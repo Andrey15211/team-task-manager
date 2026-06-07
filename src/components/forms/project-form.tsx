@@ -6,6 +6,7 @@ import {
   projectSchema,
   type ProjectInput,
 } from "@/lib/schemas";
+import { useI18n } from "@/lib/i18n";
 
 export function ProjectForm({
   defaultValues,
@@ -18,6 +19,7 @@ export function ProjectForm({
   onSubmit: (values: ProjectInput) => void;
   onCancel: () => void;
 }) {
+  const { t } = useI18n();
   const {
     register,
     handleSubmit,
@@ -33,25 +35,25 @@ export function ProjectForm({
 
   return (
     <form className="space-y-5 p-6" onSubmit={handleSubmit(onSubmit)}>
-      <Field label="Project name" error={errors.name?.message}>
-        <input {...register("name")} className="input" placeholder="Website redesign" />
+      <Field label={t("projectName")} error={errors.name ? t("validationProjectName") : undefined}>
+        <input {...register("name")} className="input" placeholder={t("projectNamePlaceholder")} />
       </Field>
-      <Field label="Description" error={errors.description?.message}>
+      <Field label={t("description")} error={errors.description ? t("validationProjectDescription") : undefined}>
         <textarea
           {...register("description")}
           className="input min-h-28 resize-none"
-          placeholder="What is the team coordinating in this project?"
+          placeholder={t("projectDescriptionPlaceholder")}
         />
       </Field>
-      <Field label="Project color" error={errors.color?.message}>
+      <Field label={t("projectColor")} error={errors.color?.message}>
         <div className="flex items-center gap-3">
           <input {...register("color")} type="color" className="size-10 cursor-pointer" />
-          <span className="text-sm text-slate-500">Used in project navigation.</span>
+          <span className="text-sm text-slate-500">{t("projectColorHint")}</span>
         </div>
       </Field>
       <div className="flex justify-end gap-3 border-t border-slate-100 pt-5">
         <button type="button" className="button-secondary" onClick={onCancel}>
-          Cancel
+          {t("cancel")}
         </button>
         <button className="button-primary" disabled={isSubmitting}>
           {submitLabel}

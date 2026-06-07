@@ -9,6 +9,8 @@ import { format, isBefore, parseISO } from "date-fns";
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/cn";
 import type { Profile, Task } from "@/types";
+import { useI18n } from "@/lib/i18n";
+import { enUS, ru } from "date-fns/locale";
 
 const priorityStyles = {
   low: "bg-slate-100 text-slate-600",
@@ -30,6 +32,7 @@ export function TaskCard({
   overlay?: boolean;
   disabled?: boolean;
 }) {
+  const { locale, priority, content } = useI18n();
   const sortable = useSortable({
     id: task.id,
     disabled,
@@ -62,15 +65,15 @@ export function TaskCard({
             priorityStyles[task.priority],
           )}
         >
-          {task.priority}
+          {priority(task.priority)}
         </span>
         <Avatar initials={assignee.initials} color={assignee.color} />
       </div>
       <h3 className="mt-3 text-sm font-semibold leading-5 text-slate-900">
-        {task.title}
+        {content(task.title)}
       </h3>
       <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">
-        {task.description}
+        {content(task.description)}
       </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {task.tags.slice(0, 2).map((tag) => (
@@ -78,7 +81,7 @@ export function TaskCard({
             key={tag}
             className="rounded-md bg-slate-50 px-2 py-1 text-[10px] text-slate-500"
           >
-            {tag}
+            {content(tag)}
           </span>
         ))}
       </div>
@@ -90,7 +93,7 @@ export function TaskCard({
           )}
         >
           <CalendarDays className="size-3.5" />
-          {format(parseISO(task.dueDate), "MMM d")}
+          {format(parseISO(task.dueDate), "MMM d", { locale: locale === "ru" ? ru : enUS })}
         </span>
         <span className="flex items-center gap-1.5">
           <MessageSquare className="size-3.5" />

@@ -23,13 +23,7 @@ import { useAppStore } from "@/lib/app-store";
 import type { Task, TaskFilters, TaskStatus } from "@/types";
 import { filterTasks } from "@/utils/taskFilters";
 import { getPermissions } from "@/utils/permissions";
-
-const columns: { status: TaskStatus; title: string }[] = [
-  { status: "todo", title: "Todo" },
-  { status: "in_progress", title: "In Progress" },
-  { status: "review", title: "Review" },
-  { status: "done", title: "Done" },
-];
+import { useI18n } from "@/lib/i18n";
 
 export function KanbanBoard({ projectId }: { projectId: string }) {
   const {
@@ -42,6 +36,8 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     addComment,
   } = useAppStore();
   const permissions = getPermissions(role);
+  const { t, status: statusLabel, priority: priorityLabel, content } = useI18n();
+  const columns: TaskStatus[] = ["todo", "in_progress", "review", "done"];
   const project = data.projects.find((item) => item.id === projectId);
   const projectTasks = data.tasks.filter((task) => task.projectId === projectId);
   const [filters, setFilters] = useState<TaskFilters>({});
@@ -66,9 +62,9 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     return (
       <div className="grid min-h-[calc(100vh-4rem)] place-items-center p-8 text-center">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">Project not found</h1>
+          <h1 className="text-xl font-semibold text-slate-900">{t("projectNotFound")}</h1>
           <p className="mt-2 text-sm text-slate-500">
-            It may have been deleted from the demo workspace.
+            {t("projectNotFoundText")}
           </p>
         </div>
       </div>
@@ -107,17 +103,17 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
                   style={{ backgroundColor: project.color }}
                 />
                 <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
-                  {project.name}
+                  {content(project.name)}
                 </h1>
               </div>
               <p className="mt-2 max-w-2xl text-sm text-slate-500">
-                {project.description}
+                {content(project.description)}
               </p>
             </div>
             {permissions.canCreateTask && (
               <button className="button-primary" onClick={() => startCreate("todo")}>
                 <Plus className="size-4" />
-                Add task
+                {t("addTask")}
               </button>
             )}
           </div>
@@ -130,16 +126,16 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
                   setFilters((current) => ({ ...current, query: event.target.value }))
                 }
                 className="input pl-9"
-                placeholder="Search tasks or tags"
+                placeholder={t("searchTasks")}
               />
             </label>
             <div className="flex gap-2 overflow-x-auto pb-1 xl:pb-0">
               <span className="flex items-center gap-2 px-2 text-xs font-medium text-slate-400">
                 <SlidersHorizontal className="size-4" />
-                Filters
+                {t("filters")}
               </span>
               <FilterSelect
-                label="Priority"
+                label={t("priority")}
                 value={filters.priority ?? "all"}
                 onChange={(priority) =>
                   setFilters((current) => ({
@@ -147,10 +143,13 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
                     priority: priority as TaskFilters["priority"],
                   }))
                 }
-                options={["all", "low", "medium", "high", "urgent"]}
+                options={[
+                  { value: "all", label: t("allPriorities") },
+                  ...(["low", "medium", "high", "urgent"] as const).map((value) => ({ value, label: priorityLabel(value) })),
+                ]}
               />
               <FilterSelect
-                label="Status"
+                label={t("status")}
                 value={filters.status ?? "all"}
                 onChange={(status) =>
                   setFilters((current) => ({
@@ -158,7 +157,10 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
                     status: status as TaskFilters["status"],
                   }))
                 }
-                options={["all", "todo", "in_progress", "review", "done"]}
+                options={[
+                  { value: "all", label: t("allStatuses") },
+                  ...(["todo", "in_progress", "review", "done"] as const).map((value) => ({ value, label: statusLabel(value) })),
+                ]}
               />
               <select
                 value={filters.assigneeId ?? "all"}
@@ -169,9 +171,9 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
                   }))
                 }
                 className="filter-select"
-                aria-label="Filter by assignee"
+                aria-label={t("assignee")}
               >
-                <option value="all">All assignees</option>
+                <option value="all">{t("allAssignees")}</option>
                 {data.profiles.map((profile) => (
                   <option key={profile.id} value={profile.id}>
                     {profile.name}
@@ -180,7 +182,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
               </select>
               <span className="flex items-center gap-1.5 whitespace-nowrap px-2 text-xs text-slate-400">
                 <Filter className="size-3.5" />
-                {visibleTasks.length} tasks
+                {visibleTasks.length} {t("tasks")}
               </span>
             </div>
           </div>
@@ -196,14 +198,14 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
         <div className="mx-auto grid max-w-[1600px] grid-flow-col gap-4 overflow-x-auto px-4 py-6 sm:px-6 lg:px-8 xl:grid-flow-row xl:grid-cols-4 xl:overflow-visible">
           {columns.map((column) => (
             <KanbanColumn
-              key={column.status}
-              status={column.status}
-              title={column.title}
-              tasks={visibleTasks.filter((task) => task.status === column.status)}
+              key={column}
+              status={column}
+              title={statusLabel(column)}
+              tasks={visibleTasks.filter((task) => task.status === column)}
               profiles={data.profiles}
               canCreate={permissions.canCreateTask}
               canDrag={permissions.canEditTask}
-              onCreate={() => startCreate(column.status)}
+              onCreate={() => startCreate(column)}
               onTaskClick={(task) => setSelectedTaskId(task.id)}
             />
           ))}
@@ -239,7 +241,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
           setFormOpen(true);
         }}
         onDelete={() => {
-          if (selectedTask && window.confirm(`Delete "${selectedTask.title}"?`)) {
+          if (selectedTask && window.confirm(`${content(selectedTask.title)}: ${t("deleteTaskConfirm")}`)) {
             deleteTask(selectedTask.id);
             setSelectedTaskId(null);
           }
@@ -247,7 +249,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
         onComment={(body) => selectedTask && addComment(selectedTask.id, body)}
       />
       <Modal
-        title={editingTask ? "Edit task" : "Create task"}
+        title={editingTask ? t("editTask") : t("createTask")}
         open={formOpen}
         onClose={() => {
           setFormOpen(false);
@@ -277,7 +279,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
                   tags: "",
                 }
           }
-          submitLabel={editingTask ? "Save changes" : "Create task"}
+          submitLabel={editingTask ? t("saveChanges") : t("createTask")}
           onCancel={() => {
             setFormOpen(false);
             setEditingTask(null);
@@ -303,20 +305,18 @@ function FilterSelect({
   label: string;
   value: string;
   onChange: (value: string) => void;
-  options: string[];
+  options: Array<{ value: string; label: string }>;
 }) {
   return (
     <select
       value={value}
       onChange={(event) => onChange(event.target.value)}
       className="filter-select"
-      aria-label={`Filter by ${label.toLowerCase()}`}
+      aria-label={label}
     >
       {options.map((option) => (
-        <option key={option} value={option}>
-          {option === "all"
-            ? `All ${label.toLowerCase()}`
-            : option.replace("_", " ")}
+        <option key={option.value} value={option.value}>
+          {option.label}
         </option>
       ))}
     </select>

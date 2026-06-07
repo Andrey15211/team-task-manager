@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { taskSchema, type TaskInput } from "@/lib/schemas";
 import type { Profile } from "@/types";
+import { useI18n } from "@/lib/i18n";
 
 export function TaskForm({
   profiles,
@@ -18,6 +19,7 @@ export function TaskForm({
   onSubmit: (values: TaskInput) => void;
   onCancel: () => void;
 }) {
+  const { t, status, priority } = useI18n();
   const {
     register,
     handleSubmit,
@@ -37,34 +39,28 @@ export function TaskForm({
 
   return (
     <form className="space-y-5 p-6" onSubmit={handleSubmit(onSubmit)}>
-      <Field label="Task title" error={errors.title?.message}>
-        <input {...register("title")} className="input" placeholder="Prepare sprint review" />
+      <Field label={t("taskTitle")} error={errors.title ? t("validationTaskTitle") : undefined}>
+        <input {...register("title")} className="input" placeholder={t("taskTitlePlaceholder")} />
       </Field>
-      <Field label="Description" error={errors.description?.message}>
+      <Field label={t("description")} error={errors.description ? t("validationTaskDescription") : undefined}>
         <textarea
           {...register("description")}
           className="input min-h-28 resize-none"
-          placeholder="Add enough context for the assignee to start."
+          placeholder={t("taskDescriptionPlaceholder")}
         />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Status" error={errors.status?.message}>
+        <Field label={t("status")} error={errors.status?.message}>
           <select {...register("status")} className="input">
-            <option value="todo">Todo</option>
-            <option value="in_progress">In Progress</option>
-            <option value="review">Review</option>
-            <option value="done">Done</option>
+            {(["todo", "in_progress", "review", "done"] as const).map((item) => <option key={item} value={item}>{status(item)}</option>)}
           </select>
         </Field>
-        <Field label="Priority" error={errors.priority?.message}>
+        <Field label={t("priority")} error={errors.priority?.message}>
           <select {...register("priority")} className="input">
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
+            {(["low", "medium", "high", "urgent"] as const).map((item) => <option key={item} value={item}>{priority(item)}</option>)}
           </select>
         </Field>
-        <Field label="Assignee" error={errors.assigneeId?.message}>
+        <Field label={t("assignee")} error={errors.assigneeId ? t("validationAssignee") : undefined}>
           <select {...register("assigneeId")} className="input">
             {profiles.map((profile) => (
               <option key={profile.id} value={profile.id}>
@@ -73,20 +69,20 @@ export function TaskForm({
             ))}
           </select>
         </Field>
-        <Field label="Deadline" error={errors.dueDate?.message}>
+        <Field label={t("deadline")} error={errors.dueDate ? t("validationDeadline") : undefined}>
           <input {...register("dueDate")} type="date" className="input" />
         </Field>
       </div>
-      <Field label="Tags" error={errors.tags?.message}>
+      <Field label={t("tags")} error={errors.tags?.message}>
         <input
           {...register("tags")}
           className="input"
-          placeholder="Design, Research, Mobile"
+          placeholder={t("tagsPlaceholder")}
         />
       </Field>
       <div className="flex justify-end gap-3 border-t border-slate-100 pt-5">
         <button type="button" className="button-secondary" onClick={onCancel}>
-          Cancel
+          {t("cancel")}
         </button>
         <button className="button-primary" disabled={isSubmitting}>
           {submitLabel}

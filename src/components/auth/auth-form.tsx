@@ -7,9 +7,11 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { createMockSession } from "@/lib/mock-auth";
 import { authSchema, type AuthInput } from "@/lib/schemas";
+import { useI18n } from "@/lib/i18n";
 
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const router = useRouter();
+  const { locale, setLocale, t } = useI18n();
   const {
     register,
     handleSubmit,
@@ -37,16 +39,16 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             <span className="text-lg font-semibold tracking-tight">Taskflow</span>
           </Link>
           <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
-            {isLogin ? "Welcome back" : "Create your workspace"}
+            {isLogin ? t("welcomeBack") : t("createWorkspace")}
           </h1>
           <p className="mt-2 text-sm leading-6 text-slate-500">
             {isLogin
-              ? "Sign in to coordinate projects, deadlines, and team progress."
-              : "Start organizing team work with a focused project workspace."}
+              ? t("loginText")
+              : t("registerText")}
           </p>
           <form className="mt-8 space-y-5" onSubmit={handleSubmit(submit)}>
             <label className="block space-y-2 text-sm font-medium text-slate-700">
-              <span>Email</span>
+              <span>{t("email")}</span>
               <input
                 {...register("email")}
                 className="input"
@@ -54,11 +56,11 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
                 autoComplete="email"
               />
               {errors.email && (
-                <span className="block text-xs text-rose-600">{errors.email.message}</span>
+                <span className="block text-xs text-rose-600">{t("validationEmail")}</span>
               )}
             </label>
             <label className="block space-y-2 text-sm font-medium text-slate-700">
-              <span>Password</span>
+              <span>{t("password")}</span>
               <input
                 {...register("password")}
                 className="input"
@@ -67,37 +69,44 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
               />
               {errors.password && (
                 <span className="block text-xs text-rose-600">
-                  {errors.password.message}
+                  {t("validationPassword")}
                 </span>
               )}
             </label>
             <button className="button-primary w-full">
-              {isLogin ? "Sign in" : "Create account"}
+              {isLogin ? t("signIn") : t("createAccount")}
               <ArrowRight className="size-4" />
             </button>
           </form>
           <p className="mt-6 text-center text-sm text-slate-500">
-            {isLogin ? "New to Taskflow?" : "Already have an account?"}{" "}
+            {isLogin ? t("newToTaskflow") : t("alreadyAccount")}{" "}
             <Link
               href={isLogin ? "/register" : "/login"}
               className="font-semibold text-indigo-600 hover:text-indigo-700"
             >
-              {isLogin ? "Create an account" : "Sign in"}
+              {isLogin ? t("createAccount") : t("signIn")}
             </Link>
           </p>
         </div>
       </section>
       <section className="hidden items-center bg-slate-950 px-12 text-white lg:flex">
         <div className="mx-auto max-w-lg">
-          <p className="text-sm font-medium text-indigo-300">Focused team execution</p>
+          <div className="mb-8 flex gap-2">
+            {(["ru", "en"] as const).map((item) => (
+              <button key={item} type="button" onClick={() => setLocale(item)} className={`rounded-md px-3 py-1.5 text-xs font-semibold ${locale === item ? "bg-white text-slate-950" : "bg-white/10 text-white"}`}>
+                {item.toUpperCase()}
+              </button>
+            ))}
+          </div>
+          <p className="text-sm font-medium text-indigo-300">{t("focusedExecution")}</p>
           <h2 className="mt-5 text-4xl font-semibold leading-tight tracking-tight">
-            One clear place for every project decision and deadline.
+            {t("authHero")}
           </h2>
           <div className="mt-10 space-y-5">
             {[
-              "Move work through a visual four-stage workflow.",
-              "Keep roles and editing rights explicit.",
-              "Review deadlines and discussion without losing context.",
+              t("authBenefit1"),
+              t("authBenefit2"),
+              t("authBenefit3"),
             ].map((item) => (
               <div key={item} className="flex items-start gap-3 text-sm text-slate-300">
                 <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-indigo-400" />

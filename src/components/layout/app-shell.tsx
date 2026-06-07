@@ -20,11 +20,13 @@ import { useAppStore } from "@/lib/app-store";
 import { cn } from "@/lib/cn";
 import { Avatar } from "@/components/ui/avatar";
 import type { Role } from "@/types";
+import { useI18n } from "@/lib/i18n";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { locale, setLocale, t, role: roleLabel, content } = useI18n();
   const { data, currentUserId, role, setRole, resetDemo } = useAppStore();
   const user = data.profiles.find((profile) => profile.id === currentUserId)!;
   const currentProject = data.projects.find((project) =>
@@ -42,7 +44,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <button
           className="fixed inset-0 z-30 bg-slate-950/30 lg:hidden"
           onClick={() => setMobileOpen(false)}
-          aria-label="Close navigation"
+          aria-label={t("closeNavigation")}
         />
       )}
       <aside
@@ -61,25 +63,25 @@ export function AppShell({ children }: { children: ReactNode }) {
           <button
             className="rounded-lg p-2 text-slate-500 lg:hidden"
             onClick={() => setMobileOpen(false)}
-            aria-label="Close sidebar"
+            aria-label={t("closeSidebar")}
           >
             <X className="size-4" />
           </button>
         </div>
         <nav className="space-y-1 px-3 py-4">
           <NavLink href="/dashboard" active={pathname === "/dashboard"} icon={BarChart3}>
-            Overview
+            {t("overview")}
           </NavLink>
           <NavLink
             href="/projects"
             active={pathname === "/projects"}
             icon={FolderKanban}
           >
-            Projects
+            {t("projects")}
           </NavLink>
         </nav>
         <div className="px-5 pb-2 pt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-          Workspace projects
+          {t("workspaceProjects")}
         </div>
         <div className="flex-1 space-y-1 overflow-y-auto px-3">
           {data.projects.map((project) => (
@@ -96,7 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 className="size-2.5 rounded-[4px]"
                 style={{ backgroundColor: project.color }}
               />
-              <span className="truncate">{project.name}</span>
+              <span className="truncate">{content(project.name)}</span>
             </Link>
           ))}
           <Link
@@ -104,7 +106,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-100 hover:text-slate-700"
           >
             <Plus className="size-4" />
-            New project
+            {t("newProject")}
           </Link>
         </div>
         <div className="border-t border-slate-200 p-3">
@@ -113,14 +115,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-900"
           >
             <Settings className="size-4" />
-            Reset demo data
+            {t("resetDemo")}
           </button>
           <button
             onClick={logout}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-900"
           >
             <LogOut className="size-4" />
-            Log out
+            {t("logout")}
           </button>
         </div>
       </aside>
@@ -129,35 +131,48 @@ export function AppShell({ children }: { children: ReactNode }) {
           <button
             className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden"
             onClick={() => setMobileOpen(true)}
-            aria-label="Open navigation"
+            aria-label={t("openNavigation")}
           >
             <Menu className="size-5" />
           </button>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-slate-950">
-              {currentProject?.name ?? (pathname === "/projects" ? "Projects" : "Overview")}
+              {currentProject ? content(currentProject.name) : pathname === "/projects" ? t("projects") : t("overview")}
             </p>
             <p className="hidden text-xs text-slate-400 sm:block">
-              Northstar workspace
+              Northstar {t("workspace").toLocaleLowerCase(locale)}
             </p>
           </div>
           <label className="relative hidden w-64 lg:block">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
             <input
               className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-              placeholder="Search workspace"
+              placeholder={t("searchWorkspace")}
             />
           </label>
+          <div className="flex h-9 items-center rounded-lg border border-slate-200 bg-white p-1 text-xs font-semibold">
+            {(["ru", "en"] as const).map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setLocale(item)}
+                className={cn("h-7 rounded-md px-2", locale === item ? "bg-indigo-600 text-white" : "text-slate-500")}
+                aria-pressed={locale === item}
+              >
+                {item.toUpperCase()}
+              </button>
+            ))}
+          </div>
           <label className="relative">
             <select
               value={role}
               onChange={(event) => setRole(event.target.value as Role)}
               className="h-9 appearance-none rounded-lg border border-slate-200 bg-white py-0 pl-3 pr-8 text-xs font-medium capitalize text-slate-600 outline-none"
-              aria-label="Demo role"
+              aria-label={t("demoRole")}
             >
-              <option value="owner">Owner</option>
-              <option value="member">Member</option>
-              <option value="readonly">Readonly</option>
+              {(["owner", "member", "readonly"] as Role[]).map((item) => (
+                <option key={item} value={item}>{roleLabel(item)}</option>
+              ))}
             </select>
             <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-slate-400" />
           </label>

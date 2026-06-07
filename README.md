@@ -1,5 +1,10 @@
 # Taskflow
 
+## Links
+
+- GitHub: https://github.com/Andrey15211/team-task-manager
+- Live Demo: https://team-task-manager-gilt-eta.vercel.app
+
 Taskflow is a portfolio-grade team task management application built around project ownership, role-aware collaboration, deadlines, comments, filters, and a drag-and-drop Kanban workflow.
 
 The current demo uses typed mock data persisted in `localStorage`. Authentication and data access are isolated behind replaceable client adapters so the UI can be connected to Supabase or Auth.js without restructuring feature components.
@@ -27,6 +32,7 @@ The current demo uses typed mock data persisted in `localStorage`. Authenticatio
 - Combined search, priority, status, and assignee filters
 - Owner, member, and readonly UI permission modes
 - Responsive sidebar, horizontally scrollable mobile Kanban, loading, error, and empty states
+- Russian-first RU/EN interface switcher with localized navigation, forms, statuses, roles, and demo content
 - Local persistence and demo-data reset
 
 ## Role System
@@ -121,6 +127,10 @@ npm run dev
 ```
 
 Open `http://localhost:3000`. The login form is prefilled with demo credentials; any valid email and password of at least six characters creates the mock session.
+
+## RU/EN Localization
+
+Russian is the default interface language. The `RU / EN` switcher is available on authentication pages and in the application header. The selected locale is persisted in `localStorage`; interface labels, forms, statuses, priorities, roles, dates, validation feedback, empty states, and seeded demo content follow the selected language.
 
 ## Checks
 

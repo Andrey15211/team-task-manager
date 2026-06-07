@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
+import { useI18n } from "@/lib/i18n";
 
 export function Modal({
   title,
@@ -14,6 +15,7 @@ export function Modal({
   onClose: () => void;
   children: ReactNode;
 }) {
+  const { t } = useI18n();
   useEffect(() => {
     const close = (event: KeyboardEvent) => event.key === "Escape" && onClose();
     window.addEventListener("keydown", close);
@@ -36,7 +38,7 @@ export function Modal({
           <button
             className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t("closeDialog")}
           >
             <X className="size-4" />
           </button>
