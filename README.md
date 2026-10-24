@@ -7,13 +7,13 @@
 
 Taskflow is a portfolio-grade team task manager centered on projects, deadlines, comments, role-aware controls, filters, and a drag-and-drop Kanban workflow. The demo uses typed mock data and local browser persistence while keeping authentication and data access behind replaceable boundaries.
 
-## Live Demo
+## 🚀 Live Demo
 
-https://team-task-manager-gilt-eta.vercel.app
+**[https://team-task-manager-gilt-eta.vercel.app](https://team-task-manager-gilt-eta.vercel.app)**
 
 ## Source Code
 
-https://github.com/Andrey15211/team-task-manager
+**[https://github.com/Andrey15211/team-task-manager](https://github.com/Andrey15211/team-task-manager)**
 
 ## Features
 
