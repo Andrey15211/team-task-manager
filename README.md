@@ -84,3 +84,11 @@ Deployed on Vercel using the Next.js preset. The mock-data version needs no envi
 ## Recommended GitHub Topics
 
 `task-manager` `kanban` `project-management` `nextjs` `typescript` `dnd-kit` `react-hook-form` `zod` `role-based-access` `vercel`
+
+---
+
+## Contact
+
+**Telegram:** [@andrey15211](https://t.me/andrey15211)  
+**Email:** andrejbadalin8@gmail.com  
+**GitHub:** [Andrey15211](https://github.com/Andrey15211)
